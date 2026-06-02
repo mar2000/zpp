@@ -1,0 +1,46 @@
+{% extends "routes/base.html" %}
+
+{% block content %}
+<div class="page-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.5rem;">
+    <div>
+        <h2>Moje rysunki</h2>
+        <p style="margin:0; color:#64748b;">Twoje rysunki matematyczne: grafy, geometria, wykresy i tekst LaTeX.</p>
+    </div>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <a href="{% url 'drawing_import_json' %}" class="btn btn-secondary">Importuj JSON</a>
+        <a href="{% url 'drawing_create' %}" class="btn btn-primary">Nowy rysunek</a>
+    </div>
+</div>
+
+{% if drawings %}
+    <div class="drawing-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:1rem;">
+        {% for drawing in drawings %}
+            <article style="background:white; border-radius:8px; padding:1rem; box-shadow:0 2px 5px rgba(0,0,0,0.06);">
+                <h3 style="margin-top:0;">
+                    <a href="{% url 'drawing_detail' drawing.pk %}" style="color:var(--primary-blue); text-decoration:none;">{{ drawing.title }}</a>
+                </h3>
+                <p><strong>Tryb:</strong> {{ drawing.get_mode_display }}</p>
+                <p><strong>Obiekty:</strong> {{ drawing.drawing_objects.count }}</p>
+                <p style="color:#64748b; font-size:0.9rem;">Ostatnia zmiana: {{ drawing.updated_at|date:"Y-m-d H:i" }}</p>
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                    <a href="{% url 'drawing_detail' drawing.pk %}" class="btn btn-secondary btn-sm">Otwórz</a>
+                    <form method="post" action="{% url 'drawing_duplicate' drawing.pk %}" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary btn-sm">Duplikuj</button>
+                    </form>
+                    <a href="{% url 'drawing_delete' drawing.pk %}" class="btn btn-danger btn-sm">Usuń</a>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="background:white; border-radius:8px; padding:2rem; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.06);">
+        <h3>Nie masz jeszcze rysunków</h3>
+        <p>Utwórz pierwszy rysunek matematyczny albo zaimportuj rysunek z pliku JSON.</p>
+        <div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap;">
+            <a href="{% url 'drawing_import_json' %}" class="btn btn-secondary">Importuj JSON</a>
+            <a href="{% url 'drawing_create' %}" class="btn btn-primary">Nowy rysunek</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

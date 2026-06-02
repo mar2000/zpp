@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Editor</title>
+    <style>
+        :root {
+            --primary-blue: #2c3e50;
+            --secondary-blue: #3498db;
+            --light-blue: #ecf0f1;
+            --accent-blue: #2980b9;
+            --text-dark: #2c3e50;
+            --text-light: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: var(--text-dark);
+            line-height: 1.6;
+            
+            --btn-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 300;
+        }
+        
+        .auth-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            margin-left: 1rem;
+            transition: color 0.3s;
+        }
+        
+        .auth-links a:hover {
+            color: var(--secondary-blue);
+        }
+        
+        .nav {
+            background-color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .nav a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            margin-right: 1.5rem;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+        
+        .nav a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary-blue);
+            transition: width 0.3s;
+        }
+        
+        .nav a:hover:after {
+            width: 100%;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-blue);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d5dbdb;
+        }
+        
+        .text-danger {
+            color: #e74c3c;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-error {
+            background-color: #fde8e8;
+            color: #c53030;
+        }
+        
+        .alert-success {
+            background-color: #e6fffa;
+            color: #2c7a7b;
+        }
+        
+        
+        
+
+	.btn {
+	    display: inline-flex;
+	    align-items: center;
+	    justify-content: center;
+	    gap: 8px;
+	    padding: 0.7rem 1.2rem;
+	    border-radius: 6px;
+	    font-family: var(--btn-font);
+	    font-size: 0.95rem;
+	    font-weight: 500;
+	    text-decoration: none;
+	    cursor: pointer;
+	    border: none;
+	    transition: all 0.3s ease;
+	    line-height: 1;
+	    height: auto;
+	    min-height: 38px; /* Wspólna minimalna wysokość */
+	}
+
+	.btn-primary {
+	    background-color: var(--secondary-blue);
+	    color: white;
+	}
+
+	.btn-primary:hover {
+	    background-color: var(--accent-blue);
+	    transform: translateY(-1px);
+	    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+	}
+
+	.btn-secondary {
+	    background-color: var(--light-blue);
+	    color: var(--primary-blue);
+	    border: 1px solid #d1d5db;
+	}
+
+	.btn-secondary:hover {
+	    background-color: #dbeafe;
+	    transform: translateY(-1px);
+	}
+
+	.btn-danger {
+	    background-color: #ef4444;
+	    color: white;
+	}
+
+	.btn-danger:hover {
+	    background-color: #dc2626;
+	    transform: translateY(-1px);
+	    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+	}
+
+	.btn-outline {
+	    background: transparent;
+	    color: var(--secondary-blue);
+	    border: 1px solid var(--secondary-blue);
+	}
+
+	.btn-outline:hover {
+	    background: rgba(59, 130, 246, 0.1);
+	}
+
+	/* Style dla małych przycisków (np. do usuwania punktów) */
+	.btn-sm {
+	    padding: 0.4rem 0.8rem;
+	    font-size: 0.85rem;
+	    min-height: 32px;
+	}
+
+	/* Style dla ikon w przyciskach */
+	.btn i {
+	    font-size: 0.9em;
+	}
+        
+
+        .container {
+            max-width: 1500px;
+        }
+
+        .header {
+            background-color: var(--primary-blue);
+            color: white;
+            border-bottom: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: white;
+            font-weight: 300;
+            letter-spacing: normal;
+        }
+
+        .auth-links,
+        .auth-links a {
+            color: var(--text-light);
+        }
+
+        .auth-links a:hover {
+            color: var(--secondary-blue);
+        }
+
+        .nav {
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: none;
+        }
+
+        .drawing-create-card {
+            max-width: 760px;
+            margin: 2rem auto;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 2rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+        }
+
+        .drawing-create-card__header {
+            margin-bottom: 1.5rem;
+        }
+
+        .drawing-create-card__eyebrow {
+            margin: 0 0 0.35rem;
+            color: #2563eb;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .drawing-create-card h2 {
+            margin: 0;
+            font-size: 1.85rem;
+            letter-spacing: -0.03em;
+        }
+
+        .drawing-create-card__header p {
+            margin: 0.45rem 0 0;
+            color: #64748b;
+        }
+
+        .drawing-create-form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .drawing-create-form__field {
+            display: grid;
+            gap: 0.35rem;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .drawing-create-form__field input,
+        .drawing-create-form__field select {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 0.8rem 0.9rem;
+            font: inherit;
+            background: #f8fafc;
+        }
+
+        .drawing-create-form__field input:focus,
+        .drawing-create-form__field select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.16);
+            background: #ffffff;
+        }
+
+        .drawing-create-modes {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .drawing-create-modes__item {
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            padding: 0.85rem;
+            background: #eff6ff;
+        }
+
+        .drawing-create-modes__item strong,
+        .drawing-create-modes__item span {
+            display: block;
+        }
+
+        .drawing-create-modes__item span {
+            margin-top: 0.25rem;
+            color: #475569;
+            font-size: 0.88rem;
+            line-height: 1.35;
+        }
+
+        .drawing-create-form__actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 760px) {
+            .drawing-create-modes {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+</head>
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <h1>Route Editor</h1>
+            <div class="auth-links">
+                {% if user.is_authenticated %}
+                    Witaj, {{ user.username }}!
+                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" style="background: none; border: none; color: var(--text-light); cursor: pointer; margin-left: 0.5rem;">Wyloguj</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}">Zaloguj</a>
+                    <a href="{% url 'register' %}">Zarejestruj</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    
+    <nav class="nav">
+        <div class="container">
+            
+            {% if user.is_authenticated %}
+                <a href="{% url 'drawing_list' %}">Moje rysunki</a>
+                <a href="{% url 'drawing_create' %}">Nowy rysunek</a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

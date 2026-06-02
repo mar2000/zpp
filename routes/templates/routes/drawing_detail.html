@@ -1,0 +1,538 @@
+{% extends "routes/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'routes/drawing_editor.css' %}">
+
+<div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.5rem;">
+    <div>
+        <h2>{{ drawing.title }}</h2>
+        <p style="margin:0; color:#64748b;">Tryb: {{ drawing.get_mode_display }} · Obiekty: <span data-role="object-count">{{ objects|length }}</span></p>
+    </div>
+</div>
+
+<section
+    class="drawing-editor"
+    data-drawing-editor
+    data-objects-url="{% url 'drawing_objects_collection' drawing.pk %}"
+    data-tikz-preview-url="{% url 'drawing_tikz_preview' drawing.pk %}"
+    data-settings-url="{% url 'drawing_settings_api' drawing.pk %}"
+    data-canvas-width="{{ canvas_width }}"
+    data-canvas-height="{{ canvas_height }}"
+    data-grid-size="{{ drawing_settings.canvas.gridSize }}"
+    data-show-grid="{{ drawing_settings.canvas.showGrid|yesno:'true,false' }}"
+    data-snap-to-grid="{{ drawing_settings.canvas.snapToGrid|yesno:'true,false' }}"
+    data-tikz-scale="{{ drawing_settings.tikz.scale }}"
+    data-drawing-mode="{{ drawing.mode }}"
+    data-drawing-title="{{ drawing.title|escapejs }}"
+>
+    <aside class="drawing-editor__objects-panel">
+        <div class="drawing-editor__panel-header">
+            <h3>Obiekty</h3>
+            <span data-role="object-count">{{ objects|length }}</span>
+        </div>
+        <p class="drawing-editor__hint">Kliknij obiekt na liście albo na rysunku. Ctrl/Shift-klik dodaje do zaznaczenia.</p>
+        <div class="drawing-editor__object-list" data-role="object-list"></div>
+    </aside>
+
+    <div class="drawing-editor__main">
+        <div class="drawing-editor__toolbar">
+            <div class="drawing-editor__toolbox" aria-label="Narzędzia rysowania" data-role="toolbox" data-drawing-mode="{{ drawing.mode }}">
+                <select class="drawing-editor__tool-select" data-role="object-type" aria-label="Aktualne narzędzie">
+                    <option value="select">Zaznaczanie / przesuwanie</option>
+                    {% if is_text_mode %}<option value="text.latex">text.latex</option>{% endif %}
+                    {% if is_graph_mode %}
+                        <option value="graph.vertex">graph.vertex</option>
+                        <option value="graph.edge.undirected">graph.edge.undirected</option>
+                        <option value="graph.edge.directed">graph.edge.directed</option>
+                    {% endif %}
+                    {% if is_geometry_mode %}
+                        <option value="geometry.point">geometry.point</option>
+                        <option value="geometry.segment">geometry.segment</option>
+                        <option value="geometry.circle">geometry.circle</option>
+                        <option value="geometry.polygon">geometry.polygon</option>
+                    {% endif %}
+                    {% if is_plot_mode %}
+                        <option value="plot.chart">plot.chart</option>
+                    {% endif %}
+                </select>
+
+                <div class="drawing-editor__tool-group" data-tool-group="selection">
+                    <span class="drawing-editor__tool-group-title">Zaznaczanie</span>
+                    <button type="button" class="drawing-editor__tool-button drawing-editor__tool-button--active" data-tool-button="select">Zaznacz / przesuń</button>
+                </div>
+
+                {% if is_text_mode %}
+                <div class="drawing-editor__tool-group" data-tool-group="text">
+                    <span class="drawing-editor__tool-group-title">Tekst</span>
+                    <button type="button" class="drawing-editor__tool-button" data-tool-button="text.latex">Tekst LaTeX</button>
+                </div>
+                {% endif %}
+
+                {% if is_graph_mode %}
+                <div class="drawing-editor__tool-group" data-tool-group="graph">
+                    <span class="drawing-editor__tool-group-title">Grafy</span>
+                    <button type="button" class="drawing-editor__tool-button" data-tool-button="graph.vertex">Wierzchołek</button>
+                    <button type="button" class="drawing-editor__tool-button" data-tool-button="graph.edge.undirected">Krawędź nieskierowana</button>
+                    <button type="button" class="drawing-editor__tool-button" data-tool-button="graph.edge.directed">Krawędź skierowana</button>
+                </div>
+                {% endif %}
+
+                {% if is_geometry_mode %}
+                <div class="drawing-editor__tool-group" data-tool-group="geometry">
+                    <span class="drawing-editor__tool-group-title">Geometria</span>
+                    <button type="button" class="drawing-editor__tool-button" data-tool-button="geometry.point">Punkt</button>
+                    <button type="button" class="drawing-editor__tool-button" data-tool-button="geometry.segment">Odcinek</button>
+                    <button type="button" class="drawing-editor__tool-button" data-tool-button="geometry.circle">Okrąg</button>
+                    <button type="button" class="drawing-editor__tool-button" data-tool-button="geometry.polygon">Wielokąt</button>
+                </div>
+                {% endif %}
+
+                {% if is_plot_mode %}
+                <div class="drawing-editor__tool-group" data-tool-group="plot">
+                    <span class="drawing-editor__tool-group-title">Wykresy</span>
+                    <button type="button" class="drawing-editor__tool-button" data-tool-button="plot.chart">Wykres</button>
+                    <button type="button" class="drawing-editor__tool-button" data-tool-button="plot.series" hidden aria-hidden="true">Legacy plot.series</button>
+                </div>
+                {% endif %}
+            </div>
+
+            <label class="drawing-editor__field drawing-editor__label-field">
+                Etykieta / tekst
+                <input type="text" data-role="object-label" placeholder="np. A, v_1, q_0, \alpha">
+            </label>
+
+            <div class="drawing-editor__toolbar-actions">
+                <button type="button" class="btn btn-secondary" data-action="undo" disabled>Cofnij</button>
+                <button type="button" class="btn btn-secondary" data-action="redo" disabled>Ponów</button>
+                <!-- Wielokąt domykamy kliknięciem pierwszego punktu, bez osobnych przycisków. -->
+                <button type="button" class="btn btn-secondary" data-action="bring-to-front">Na wierzch</button>
+                <button type="button" class="btn btn-secondary" data-action="send-to-back">Pod spód</button>
+                <button type="button" class="btn btn-secondary" data-action="move-up">Wyżej</button>
+                <button type="button" class="btn btn-secondary" data-action="move-down">Niżej</button>
+                <button type="button" class="btn btn-secondary" data-action="duplicate-selected">Duplikuj zaznaczone</button>
+                <button type="button" class="btn btn-danger" data-action="delete-selected">Usuń zaznaczone</button>
+                <span class="drawing-editor__selection-counter" data-role="selection-count">Zaznaczono: 0</span>
+            </div>
+        </div>
+
+        <div class="drawing-editor__canvas-wrap">
+            <svg
+                data-role="drawing-canvas"
+                class="drawing-editor__canvas"
+                viewBox="0 0 {{ canvas_width }} {{ canvas_height }}"
+                role="img"
+                aria-label="Obszar rysunku strukturalnego"
+            >
+                {% for x in grid_x %}
+                    <line class="drawing-editor__grid-line" x1="{{ x }}" y1="0" x2="{{ x }}" y2="{{ canvas_height }}"></line>
+                {% endfor %}
+                {% for y in grid_y %}
+                    <line class="drawing-editor__grid-line" x1="0" y1="{{ y }}" x2="{{ canvas_width }}" y2="{{ y }}"></line>
+                {% endfor %}
+
+            </svg>
+        </div>
+
+        <section class="drawing-editor__export-section drawing-editor__export-section--under-canvas">
+            <h3>Eksport</h3>
+            <div class="drawing-editor__export-actions">
+                <a href="{% url 'drawing_export_tikz' drawing.pk %}" class="btn btn-primary drawing-editor__export-button">Pobierz TikZ</a>
+                <a href="{% url 'drawing_export_json' drawing.pk %}" class="btn btn-secondary drawing-editor__export-button">Pobierz JSON</a>
+                <button type="button" class="btn btn-secondary drawing-editor__export-button" data-action="preview-tikz">Pokaż TikZ</button>
+                <button type="button" class="btn btn-secondary drawing-editor__export-button" data-action="copy-tikz" disabled>Kopiuj TikZ</button>
+                <button type="button" class="btn btn-secondary drawing-editor__export-button" data-action="download-svg">Pobierz SVG</button>
+                <button type="button" class="btn btn-secondary drawing-editor__export-button" data-action="download-png">Pobierz PNG</button>
+            </div>
+
+            <div class="drawing-editor__tikz-preview" data-role="tikz-preview-panel" hidden>
+                <div class="drawing-editor__tikz-preview-header">
+                    <strong>Podgląd kodu TikZ</strong>
+                    <span class="drawing-editor__hint" data-role="tikz-preview-status">Kod nie został jeszcze wygenerowany.</span>
+                </div>
+                <textarea
+                    class="drawing-editor__tikz-textarea"
+                    data-role="tikz-preview"
+                    spellcheck="false"
+                    readonly
+                    placeholder="Kliknij „Pokaż TikZ”, żeby wygenerować podgląd bez pobierania pliku."
+                ></textarea>
+            </div>
+        </section>
+
+        <p class="drawing-editor__status" data-role="drawing-status">Wybierz narzędzie z paska. Widoczne są tylko narzędzia zgodne z trybem tego rysunku: Graf, Geometria albo Wykresy. graph.vertex łączymy tylko krawędziami grafowymi. Wielokąt domykasz kliknięciem pierwszego punktu.</p>
+
+        <div class="drawing-editor__plot-panel drawing-editor__plot-panel--below-canvas" data-role="plot-panel" {% if not is_plot_mode %}hidden{% endif %}>
+            <div class="drawing-editor__plot-header">
+                <div>
+                    <h3>Wykres</h3>
+                    <p class="drawing-editor__hint">Edytuj jeden wykres w tym rysunku: dodawaj serie danych, funkcje oraz ustawienia osi i legendy.</p>
+                </div>
+                <button type="button" class="btn btn-primary" data-action="apply-plot-chart">Zastosuj wykres</button>
+            </div>
+
+            <div class="drawing-editor__plot-layout">
+                <section class="drawing-editor__plot-card">
+                    <div class="drawing-editor__plot-card-header">
+                        <h4>Serie danych</h4>
+                        <span class="drawing-editor__hint">Lista serii na wykresie</span>
+                    </div>
+                    <div class="drawing-editor__plot-list" data-role="plot-series-list" aria-live="polite"></div>
+
+                    <div class="drawing-editor__plot-form">
+                        <h5>Dodaj / edytuj serię</h5>
+                        <input type="hidden" data-role="plot-series-edit-index">
+                        <div class="drawing-editor__plot-form-grid">
+                            <label class="drawing-editor__field">
+                                Nazwa serii
+                                <input type="text" data-role="plot-series-label" placeholder="np. Seria A">
+                            </label>
+                            <label class="drawing-editor__field">
+                                Kolor
+                                <input type="color" data-role="plot-series-color" value="#2563eb">
+                            </label>
+                            <label class="drawing-editor__field">
+                                Typ
+                                <select data-role="plot-series-type">
+                                    <option value="line">Liniowy</option>
+                                    <option value="scatter">Punktowy</option>
+                                    <option value="line_markers">Liniowy z punktami</option>
+                                </select>
+                            </label>
+                        </div>
+                        <label class="drawing-editor__field">
+                            Punkty serii
+                            <span class="drawing-editor__field-hint">Format: <code>x,y</code> albo <code>x,y +- dx,dy</code>.</span>
+                            <textarea data-role="plot-series-points" class="drawing-editor__plot-data" spellcheck="false" placeholder="618,2.6 +- 8,0.03&#10;699,3.59 +- 8,0.02"></textarea>
+                        </label>
+                        <div class="drawing-editor__plot-actions">
+                            <button type="button" class="btn btn-secondary" data-action="save-plot-series">Dodaj serię</button>
+                            <button type="button" class="btn btn-secondary" data-action="clear-plot-series-form">Wyczyść formularz</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="drawing-editor__plot-card">
+                    <div class="drawing-editor__plot-card-header">
+                        <h4>Funkcje</h4>
+                        <span class="drawing-editor__hint">Funkcje eksportowane do pgfplots</span>
+                    </div>
+                    <div class="drawing-editor__plot-list" data-role="plot-functions-list" aria-live="polite"></div>
+
+                    <div class="drawing-editor__plot-form">
+                        <h5>Dodaj / edytuj funkcję</h5>
+                        <input type="hidden" data-role="plot-function-edit-index">
+                        <div class="drawing-editor__plot-form-grid">
+                            <label class="drawing-editor__field">
+                                Wzór funkcji
+                                <input type="text" data-role="plot-function-expression" placeholder="np. x^2">
+                            </label>
+                            <label class="drawing-editor__field">
+                                Etykieta
+                                <input type="text" data-role="plot-function-label" placeholder="np. f(x)=x^2">
+                            </label>
+                            <label class="drawing-editor__field">
+                                Kolor
+                                <input type="color" data-role="plot-function-color" value="#16a34a">
+                            </label>
+                            <label class="drawing-editor__field">
+                                X min
+                                <input type="number" data-role="plot-function-min" step="any" value="-5">
+                            </label>
+                            <label class="drawing-editor__field">
+                                X max
+                                <input type="number" data-role="plot-function-max" step="any" value="5">
+                            </label>
+                            <label class="drawing-editor__field">
+                                Liczba próbek
+                                <input type="number" data-role="plot-function-samples" min="2" step="1" value="100">
+                            </label>
+                        </div>
+                        <div class="drawing-editor__plot-actions">
+                            <button type="button" class="btn btn-secondary" data-action="save-plot-function">Dodaj funkcję</button>
+                            <button type="button" class="btn btn-secondary" data-action="clear-plot-function-form">Wyczyść formularz</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="drawing-editor__plot-card drawing-editor__plot-card--settings" data-role="plot-axis-settings">
+                <h4>Oś i legenda</h4>
+                <div class="drawing-editor__plot-form-grid drawing-editor__plot-form-grid--wide">
+                    <label class="drawing-editor__field">
+                        Tytuł wykresu
+                        <input type="text" data-role="plot-title" placeholder="np. Wyniki pomiarów">
+                    </label>
+                    <label class="drawing-editor__field">
+                        Etykieta osi X
+                        <input type="text" data-role="plot-x-label" value="x">
+                    </label>
+                    <label class="drawing-editor__field">
+                        Etykieta osi Y
+                        <input type="text" data-role="plot-y-label" value="y">
+                    </label>
+                    <label class="drawing-editor__field drawing-editor__checkbox-field">
+                        <input type="checkbox" data-role="plot-show-legend" checked>
+                        Pokaż legendę
+                    </label>
+                    <label class="drawing-editor__field">
+                        X min
+                        <input type="number" data-role="plot-x-min" step="any" placeholder="auto">
+                    </label>
+                    <label class="drawing-editor__field">
+                        X max
+                        <input type="number" data-role="plot-x-max" step="any" placeholder="auto">
+                    </label>
+                    <label class="drawing-editor__field">
+                        Y min
+                        <input type="number" data-role="plot-y-min" step="any" placeholder="auto">
+                    </label>
+                    <label class="drawing-editor__field">
+                        Y max
+                        <input type="number" data-role="plot-y-max" step="any" placeholder="auto">
+                    </label>
+                </div>
+            </section>
+
+            <textarea data-role="plot-data" class="drawing-editor__plot-data" hidden></textarea>
+            <textarea data-role="plot-functions" class="drawing-editor__plot-data" hidden></textarea>
+            <select data-role="plot-type" hidden>
+                <option value="line">Liniowy</option>
+                <option value="scatter">Punktowy</option>
+                <option value="line_markers">Liniowy z punktami</option>
+            </select>
+            <span hidden>Wykres z danych Zastosuj dane wykresu Dodaj wykres Serie danych Funkcje Pokaż legendę Jeśli pole danych będzie puste, istniejący wykres zostanie usunięty</span>
+        </div>
+    </div>
+
+    <details class="drawing-editor__side-panel" data-role="edit-drawer">
+        <summary class="drawing-editor__drawer-tab">Panel edycji</summary>
+        <div class="drawing-editor__side-panel-content">
+            <div class="drawing-editor__drawer-header">
+                <div>
+                    <h3>Panel edycji</h3>
+                    <p class="drawing-editor__hint">Wybierz zakładkę i edytuj aktualny rysunek albo zaznaczony obiekt.</p>
+                </div>
+                <button type="button" class="drawing-editor__drawer-close" data-action="close-edit-drawer" aria-label="Zamknij panel edycji">×</button>
+            </div>
+
+            <div class="drawing-editor__drawer-tabs" role="tablist" aria-label="Sekcje panelu edycji">
+                <button type="button" class="drawing-editor__drawer-tab-button drawing-editor__drawer-tab-button--active" data-panel-tab="object" role="tab" aria-selected="true">Obiekt</button>
+                <button type="button" class="drawing-editor__drawer-tab-button" data-panel-tab="style" role="tab" aria-selected="false">Styl</button>
+                <button type="button" class="drawing-editor__drawer-tab-button" data-panel-tab="settings" role="tab" aria-selected="false">Ustawienia</button>
+                <button type="button" class="drawing-editor__drawer-tab-button" data-panel-tab="default-style" role="tab" aria-selected="false">Styl nowych</button>
+            </div>
+
+            <section class="drawing-editor__drawer-section drawing-editor__drawer-section--active" data-panel-tab-panel="object" role="tabpanel">
+                <div class="drawing-editor__content-panel drawing-editor__content-panel--disabled" data-role="content-panel">
+                    <h3>Obiekt</h3>
+                    <span hidden>Treść zaznaczonego obiektu</span>
+                    <p class="drawing-editor__hint" data-role="content-panel-hint">Zaznacz punkt, tekst, krawędź, okrąg, wielokąt albo wykres, aby zmienić jego etykietę/treść.</p>
+
+                    <label class="drawing-editor__field">
+                        Etykieta / tekst LaTeX
+                        <input type="text" data-role="content-label" placeholder="np. A, e_1, \alpha+\beta" disabled>
+                    </label>
+
+                    <button type="button" class="btn btn-primary" data-action="apply-content" disabled>Zastosuj treść</button>
+                </div>
+            </section>
+
+            <section class="drawing-editor__drawer-section" data-panel-tab-panel="style" role="tabpanel" hidden>
+                <div class="drawing-editor__style-panel drawing-editor__style-panel--disabled" data-role="style-panel">
+                    <h3>Styl zaznaczonego obiektu</h3>
+                    <p class="drawing-editor__hint" data-role="style-panel-hint">Zaznacz obiekt, zmień wartości i kliknij „Zastosuj styl”. Pola niedotyczące wybranego obiektu są automatycznie blokowane.</p>
+
+                    <label class="drawing-editor__field" data-style-field="stroke">
+                        Kolor obrysu / linii
+                        <input type="color" data-role="style-stroke" value="#111827" disabled>
+                    </label>
+
+                    <label class="drawing-editor__field" data-style-field="fill">
+                        Kolor wypełnienia
+                        <input type="color" data-role="style-fill" value="#111827" disabled>
+                    </label>
+
+                    <label class="drawing-editor__field" data-style-field="stroke-width">
+                        Grubość linii
+                        <input type="number" data-role="style-stroke-width" min="1" max="20" step="0.5" value="2" disabled>
+                    </label>
+
+                    <label class="drawing-editor__field" data-style-field="line-dash">
+                        Typ linii
+                        <select data-role="style-line-dash" disabled>
+                            <option value="solid">Ciągła</option>
+                            <option value="dashed">Przerywana</option>
+                            <option value="dotted">Kropkowana</option>
+                        </select>
+                    </label>
+
+                    <label class="drawing-editor__field" data-style-field="stroke-opacity">
+                        Przezroczystość linii / obrysu
+                        <input type="range" data-role="style-stroke-opacity" min="0" max="1" step="0.05" value="1" disabled>
+                    </label>
+
+                    <label class="drawing-editor__field" data-style-field="fill-opacity">
+                        Przezroczystość wypełnienia
+                        <input type="range" data-role="style-fill-opacity" min="0" max="1" step="0.05" value="1" disabled>
+                    </label>
+
+                    <label class="drawing-editor__field" data-style-field="font-size">
+                        Rozmiar tekstu / etykiety
+                        <input type="number" data-role="style-font-size" min="8" max="72" step="1" value="14" disabled>
+                    </label>
+
+                    <label class="drawing-editor__field" data-style-field="label-position">
+                        Pozycja etykiety
+                        <select data-role="style-label-position" disabled>
+                            <option value="above-right">Nad-prawo</option>
+                            <option value="above">Nad</option>
+                            <option value="above-left">Nad-lewo</option>
+                            <option value="right">Prawo</option>
+                            <option value="center">Środek</option>
+                            <option value="left">Lewo</option>
+                            <option value="below-right">Pod-prawo</option>
+                            <option value="below">Pod</option>
+                            <option value="below-left">Pod-lewo</option>
+                        </select>
+                    </label>
+
+                    <label class="drawing-editor__field" data-style-field="radius">
+                        Promień punktu
+                        <input type="number" data-role="style-radius" min="2" max="40" step="1" value="6" disabled>
+                    </label>
+
+                    <label class="drawing-editor__checkbox-field" data-style-field="visible">
+                        <input type="checkbox" data-role="style-visible" checked disabled>
+                        Widoczny na rysunku
+                    </label>
+
+                    <label class="drawing-editor__checkbox-field" data-style-field="show-label">
+                        <input type="checkbox" data-role="style-show-label" checked disabled>
+                        Pokazuj etykietę
+                    </label>
+
+                    <label class="drawing-editor__checkbox-field" data-style-field="directed">
+                        <input type="checkbox" data-role="style-directed" disabled>
+                        Krawędź skierowana
+                    </label>
+
+                    <button type="button" class="btn btn-primary" data-action="apply-style" disabled>Zastosuj styl</button>
+                </div>
+            </section>
+
+            <section class="drawing-editor__drawer-section" data-panel-tab-panel="settings" role="tabpanel" hidden>
+                <div class="drawing-editor__settings-panel" data-role="settings-panel">
+                    <h3>Ustawienia rysunku</h3>
+                    <p class="drawing-editor__hint">Ustawienia zapisują się w bazie i będą widoczne po odświeżeniu strony.</p>
+
+                    <label class="drawing-editor__field">
+                        Szerokość canvasa
+                        <input type="number" data-role="settings-width" min="300" max="3000" step="10" value="{{ canvas_width }}">
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Wysokość canvasa
+                        <input type="number" data-role="settings-height" min="200" max="2000" step="10" value="{{ canvas_height }}">
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Rozmiar siatki
+                        <input type="number" data-role="settings-grid-size" min="5" max="300" step="5" value="{{ drawing_settings.canvas.gridSize }}">
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Skala TikZ
+                        <input type="number" data-role="settings-tikz-scale" min="1" max="1000" step="10" value="{{ drawing_settings.tikz.scale }}">
+                    </label>
+
+                    <label class="drawing-editor__checkbox-field">
+                        <input type="checkbox" data-role="settings-show-grid" {% if drawing_settings.canvas.showGrid %}checked{% endif %}>
+                        Pokazuj siatkę
+                    </label>
+
+                    <label class="drawing-editor__checkbox-field">
+                        <input type="checkbox" data-role="settings-snap-to-grid" {% if drawing_settings.canvas.snapToGrid %}checked{% endif %}>
+                        Przyciągaj punkty do siatki
+                    </label>
+
+                    <button type="button" class="btn btn-primary" data-action="apply-settings">Zastosuj ustawienia</button>
+                </div>
+            </section>
+
+            <section class="drawing-editor__drawer-section" data-panel-tab-panel="default-style" role="tabpanel" hidden>
+                <div class="drawing-editor__default-style-panel" data-role="default-style-panel">
+                    <h3>Styl nowych obiektów</h3>
+                    <p class="drawing-editor__hint">Ten styl będzie używany dla kolejnych tworzonych obiektów aż do następnej zmiany.</p>
+
+                    <label class="drawing-editor__field">
+                        Kolor obrysu / linii
+                        <input type="color" data-role="default-style-stroke" value="#111827">
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Kolor wypełnienia
+                        <input type="color" data-role="default-style-fill" value="#ffffff">
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Grubość linii
+                        <input type="number" data-role="default-style-stroke-width" min="1" max="20" step="0.5" value="2">
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Typ linii
+                        <select data-role="default-style-line-dash">
+                            <option value="solid">Ciągła</option>
+                            <option value="dashed">Przerywana</option>
+                            <option value="dotted">Kropkowana</option>
+                        </select>
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Przezroczystość linii / obrysu
+                        <input type="range" data-role="default-style-stroke-opacity" min="0" max="1" step="0.05" value="1">
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Przezroczystość wypełnienia
+                        <input type="range" data-role="default-style-fill-opacity" min="0" max="1" step="0.05" value="1">
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Rozmiar tekstu / etykiety
+                        <input type="number" data-role="default-style-font-size" min="8" max="72" step="1" value="14">
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Pozycja etykiety
+                        <select data-role="default-style-label-position">
+                            <option value="above-right">Nad-prawo</option>
+                            <option value="above">Nad</option>
+                            <option value="above-left">Nad-lewo</option>
+                            <option value="right">Prawo</option>
+                            <option value="center">Środek</option>
+                            <option value="left">Lewo</option>
+                            <option value="below-right">Pod-prawo</option>
+                            <option value="below">Pod</option>
+                            <option value="below-left">Pod-lewo</option>
+                        </select>
+                    </label>
+
+                    <label class="drawing-editor__field">
+                        Promień punktu
+                        <input type="number" data-role="default-style-radius" min="2" max="40" step="1" value="6">
+                    </label>
+
+                    <label class="drawing-editor__checkbox-field">
+                        <input type="checkbox" data-role="default-style-show-label" checked>
+                        Pokazuj etykiety nowych obiektów
+                    </label>
+                </div>
+            </section>
+        </div>
+    </details>
+</section>
+
+<script src="{% static 'routes/drawing_editor.js' %}"></script>
+{% endblock %}

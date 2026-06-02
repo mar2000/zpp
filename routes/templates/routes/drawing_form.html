@@ -1,0 +1,44 @@
+{% extends "routes/base.html" %}
+
+{% block content %}
+<section class="drawing-create-card">
+    <div class="drawing-create-card__header">
+        <p class="drawing-create-card__eyebrow">Nowy projekt</p>
+        <h2>Utwórz rysunek</h2>
+        <p>Wybierz typ pracy. Od tego zależy, jakie narzędzia pojawią się w edytorze.</p>
+    </div>
+
+    <form method="post" class="drawing-create-form">
+        {% csrf_token %}
+        <label class="drawing-create-form__field" for="{{ form.title.id_for_label }}">
+            <span>Nazwa rysunku</span>
+            {{ form.title }}
+        </label>
+
+        <label class="drawing-create-form__field" for="{{ form.mode.id_for_label }}">
+            <span>Tryb rysunku</span>
+            {{ form.mode }}
+        </label>
+
+        <div class="drawing-create-modes" aria-label="Opis typów rysunków">
+            <div class="drawing-create-modes__item">
+                <strong>Graf</strong>
+                <span>wierzchołki, krawędzie nieskierowane i skierowane</span>
+            </div>
+            <div class="drawing-create-modes__item">
+                <strong>Geometria</strong>
+                <span>punkty, odcinki, okręgi i wielokąty</span>
+            </div>
+            <div class="drawing-create-modes__item">
+                <strong>Wykresy</strong>
+                <span>serie danych, funkcje, osie i pgfplots</span>
+            </div>
+        </div>
+
+        <div class="drawing-create-form__actions">
+            <button type="submit" class="btn btn-primary">Utwórz rysunek</button>
+            <a href="{% url 'drawing_list' %}" class="btn btn-secondary">Anuluj</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

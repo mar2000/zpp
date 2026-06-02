@@ -1,0 +1,162 @@
+{% extends "routes/base.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Logowanie</h2>
+        {% if form.errors %}
+            <div class="alert alert-error">
+                Nieprawidłowa nazwa użytkownika albo hasło.
+            </div>
+        {% endif %}
+        
+        <form method="post" class="auth-form">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="{{ form.username.id_for_label }}">Nazwa użytkownika:</label>
+        {{ form.username }}
+    </div>
+    <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">Hasło:</label>
+        {{ form.password }}
+    </div>
+    <div class="form-actions">  <!-- Dodaj kontener dla przycisków -->
+        <button type="submit" class="btn btn-primary">Zaloguj</button>
+        <a href="{% url 'register' %}" class="btn btn-secondary">Zarejestruj</a>
+    </div>
+</form>
+    </div>
+</div>
+
+
+
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+    }
+    
+    .auth-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    .auth-card h2 {
+        color: var(--primary-blue);
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .form-group label {
+        color: var(--primary-blue);
+        font-weight: 500;
+    }
+    
+    .form-group input {
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border 0.3s;
+    }
+    
+    .form-group input:focus {
+        outline: none;
+        border-color: var(--secondary-blue);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+    
+    .auth-form .btn {
+        width: 100%;
+        text-align: center;
+        margin-top: 0.5rem;
+    }
+    
+    
+    
+    
+
+/* Spójne style dla wszystkich formularzy */
+.auth-form {
+    max-width: 400px;  /* Ogranicz szerokość formularza */
+    margin: 0 auto;    /* Wyśrodkuj formularz */
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Style dla pól input */
+.auth-form input[type="text"],
+.auth-form input[type="password"],
+.auth-form input[type="email"],
+.auth-form select,
+.auth-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Ważne dla poprawnego liczenia szerokości */
+}
+
+/* Kontener dla przycisków */
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Style dla przycisków */
+.btn {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    flex: 1;  /* Przyciski będą tej samej szerokości */
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+    
+    
+    
+    
+    
+    
+</style>
+{% endblock %}

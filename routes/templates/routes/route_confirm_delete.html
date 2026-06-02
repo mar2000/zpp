@@ -1,0 +1,196 @@
+{% extends "routes/base.html" %}
+
+{% block content %}
+<div class="confirmation-container">
+    <div class="confirmation-card">
+        <div class="confirmation-header">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>Confirm Deletion</h2>
+        </div>
+        
+        <div class="confirmation-content">
+            <p>Czy na pewno chcesz usunąć trasę <strong>"{{ object.title }}"</strong>?</p>
+            <p class="warning-text"><i class="fas fa-info-circle"></i> This action cannot be undone.</p>
+        </div>
+        
+        <div class="confirmation-actions">
+
+		    <form method="post" class="auth-form">
+		        {% csrf_token %}
+		        <div class="form-actions">  <!-- Dodaj kontener dla przycisków -->
+			        <button type="submit" class="btn btn-danger"> <i class="fas fa-trash"></i>  Potwierdź usunięcie</button>
+			        <a href="{% url 'route_detail' object.pk %}" class="btn btn-secondary"> <i class="fas fa-times"></i> Anuluj</a>
+		        </div>
+		    </form>
+
+            
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+.confirmation-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 1rem;
+}
+
+.confirmation-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+}
+
+.confirmation-header {
+    background: #e74c3c;
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.confirmation-header i {
+    font-size: 2.5rem;
+}
+
+.confirmation-header h2 {
+    margin: 0;
+    font-weight: 500;
+}
+
+.confirmation-content {
+    padding: 2rem;
+    text-align: center;
+}
+
+.confirmation-content p {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.warning-text {
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.confirmation-actions {
+    padding: 1.5rem;
+    background: #f9f9f9;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.confirmation-actions .btn {
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+@media (max-width: 480px) {
+    .confirmation-actions {
+        flex-direction: column;
+    }
+    
+    .confirmation-actions .btn {
+        width: 100%;
+    }
+}
+
+
+
+
+
+/* Spójne style dla wszystkich formularzy */
+.auth-form {
+    max-width: 400px;  /* Ogranicz szerokość formularza */
+    margin: 0 auto;    /* Wyśrodkuj formularz */
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Style dla pól input */
+.auth-form input[type="text"],
+.auth-form input[type="password"],
+.auth-form input[type="email"],
+.auth-form select,
+.auth-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Ważne dla poprawnego liczenia szerokości */
+}
+
+/* Kontener dla przycisków */
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Style dla przycisków */
+.btn {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    flex: 1;  /* Przyciski będą tej samej szerokości */
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+
+
+
+</style>
+{% endblock %}

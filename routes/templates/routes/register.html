@@ -1,0 +1,188 @@
+{% extends "routes/base.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2><i class="fas fa-user-plus"></i> Rejestracja </h2>
+        </div>
+        
+        {% if form.errors %}
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i> Formularz zawiera błędy
+        </div>
+        {% endif %}
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    {% if field.name == 'username' %}<i class="fas fa-user"></i>{% endif %}
+                    {% if field.name == 'password1' %}<i class="fas fa-lock"></i>{% endif %}
+                    {% if field.name == 'password2' %}<i class="fas fa-check-circle"></i>{% endif %}
+                    {% if field.name == 'username' %}Nazwa użytkownika{% elif field.name == 'password1' %}Hasło{% elif field.name == 'password2' %}Powtórz hasło{% else %}{{ field.label }}{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                <div class="form-help">{{ field.help_text }}</div>
+                {% endif %}
+                {% if field.errors %}
+                <div class="form-error">
+                    <i class="fas fa-exclamation-triangle"></i> {{ field.errors|first }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-user-check"></i> Zarejestruj
+                </button>
+                <a href="{% url 'login' %}" class="btn btn-secondary">
+                    <i class="fas fa-sign-in-alt"></i> Mam już konto
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 2rem;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 450px;
+    overflow: hidden;
+}
+
+.auth-header {
+    background: var(--primary-blue);
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.auth-header h2 {
+    margin: 0;
+    font-weight: 500;
+}
+
+.auth-header i {
+    margin-right: 10px;
+}
+
+.auth-form {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    color: var(--primary-blue);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-group label i {
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-group input:focus {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+.form-help {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin-top: 0.3rem;
+}
+
+.form-error {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-error i {
+    margin-right: 5px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+}
+
+.form-actions .btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+@media (max-width: 480px) {
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+
+
+
+
+/* Dodatkowe style dla komunikatów o błędach */
+.error-message {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Spójne style dla wszystkich pól formularza */
+input, select, textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Dla pól typu checkbox */
+input[type="checkbox"] {
+    width: auto;
+}
+
+
+</style>
+{% endblock %}
+
+
+
+

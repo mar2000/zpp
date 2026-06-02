@@ -1,0 +1,72 @@
+{% extends "routes/base.html" %}
+
+{% block content %}
+<div class="route-list-container">
+    <h2>My roads</h2>
+    <div class="route-grid">
+        {% for route in object_list %}
+            <div class="route-card">
+                <h3>{{ route.title }}</h3>
+                <p>Tło: {{ route.background.title }}</p>
+                <p>Created: {{ route.created_at|date:"d.m.Y" }}</p>
+                <div class="route-actions">
+                    <a href="{% url 'route_detail' route.pk %}" class="btn btn-primary">Otwórz</a>
+                    <a href="{% url 'route_delete' route.pk %}" class="btn text-danger" onclick="return confirm('Usuń this route?')"> <i class="fas fa-trash"></i> Usuń</a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <p>You don't have any routes yet.</p>
+                <a href="{% url 'route_create' %}" class="btn btn-primary">Utwórz pierwszą trasę.</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .route-list-container {
+        padding: 2rem 0;
+    }
+    
+    .route-list-container h2 {
+        color: var(--primary-blue);
+        margin-bottom: 1.5rem;
+    }
+    
+    .route-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .route-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .route-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .route-card h3 {
+        color: var(--primary-blue);
+        margin-top: 0;
+    }
+    
+    .route-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        grid-column: 1 / -1;
+    }
+</style>
+{% endblock %}

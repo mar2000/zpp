@@ -1,0 +1,1103 @@
+.drawing-editor {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 1rem;
+    align-items: start;
+}
+
+.drawing-editor__toolbar,
+.drawing-editor__side-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
+    padding: 1rem;
+}
+
+.drawing-editor__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: end;
+    margin-bottom: 1rem;
+}
+
+.drawing-editor__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.drawing-editor__field input,
+.drawing-editor__field select {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.45rem 0.55rem;
+    min-width: 150px;
+}
+
+.drawing-editor__canvas-wrap {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
+}
+
+.drawing-editor__canvas {
+    display: block;
+    width: 100%;
+    height: 520px;
+    cursor: crosshair;
+    background: #ffffff;
+}
+
+.drawing-editor__grid-line {
+    stroke: #eef2f7;
+    stroke-width: 1;
+}
+
+.drawing-editor__axis-line {
+    stroke: #dbe4ef;
+    stroke-width: 1.5;
+}
+
+.drawing-object {
+    cursor: grab;
+    touch-action: none;
+}
+
+.drawing-object:active {
+    cursor: grabbing;
+}
+
+.drawing-label {
+    font-size: 14px;
+    fill: #0f172a;
+    pointer-events: none;
+    user-select: none;
+}
+
+.drawing-editor__status {
+    margin-top: 0.75rem;
+    color: #475569;
+    min-height: 1.5rem;
+}
+
+.drawing-editor__status--error {
+    color: #dc2626;
+}
+
+.drawing-editor__side-panel h3 {
+    margin-top: 0;
+}
+
+.drawing-editor__object-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.drawing-editor__object-row {
+    text-align: left;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 0.65rem;
+    cursor: pointer;
+}
+
+.drawing-editor__object-row:hover,
+.drawing-editor__object-row--selected {
+    border-color: #3498db;
+    background: #eff6ff;
+}
+
+.drawing-editor__object-row span,
+.drawing-editor__object-row small {
+    display: block;
+}
+
+.drawing-editor__object-row small {
+    margin-top: 0.25rem;
+    color: #64748b;
+    word-break: break-word;
+}
+
+.drawing-editor__empty {
+    color: #64748b;
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .drawing-editor {
+        grid-template-columns: 1fr;
+    }
+}
+
+.drawing-line {
+    cursor: pointer;
+}
+
+.drawing-line[data-object-id] {
+    pointer-events: stroke;
+}
+
+.drawing-editor__style-panel {
+    border-top: 1px solid #e2e8f0;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.drawing-editor__style-panel h3 {
+    margin-bottom: 0;
+}
+
+.drawing-editor__style-panel--disabled {
+    opacity: 0.72;
+}
+
+.drawing-editor__hint {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.drawing-editor__checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+
+.drawing-text {
+    cursor: grab;
+    dominant-baseline: middle;
+    paint-order: stroke;
+}
+
+.drawing-text--selected {
+    stroke: #2563eb;
+    stroke-width: 0.75px;
+}
+
+.drawing-editor__tikz-preview {
+    margin-top: 1rem;
+}
+
+.drawing-editor__tikz-textarea {
+    width: 100%;
+    min-height: 280px;
+    box-sizing: border-box;
+    padding: 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    resize: vertical;
+}
+
+.drawing-editor__content-panel {
+    border-top: 1px solid #e2e8f0;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.drawing-editor__content-panel h3 {
+    margin-bottom: 0;
+}
+
+.drawing-editor__content-panel--disabled {
+    opacity: 0.72;
+}
+
+.drawing-editor__toolbar [data-action="undo"],
+.drawing-editor__toolbar [data-action="redo"] {
+    min-width: 5rem;
+}
+
+.drawing-editor__toolbar button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.drawing-editor__selection-counter {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.45rem 0.65rem;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #3730a3;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.drawing-editor__default-style-panel {
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    margin: 1rem 0;
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.drawing-editor__default-style-panel h3 {
+    margin-bottom: 0;
+}
+
+.drawing-line-hit {
+    cursor: pointer;
+    pointer-events: stroke;
+}
+
+.drawing-line--selected {
+    filter: drop-shadow(0 0 3px rgba(37, 99, 235, 0.45));
+}
+
+.drawing-label.drawing-object {
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.drawing-editor__selection-box {
+    fill: rgba(37, 99, 235, 0.12);
+    stroke: #2563eb;
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+    pointer-events: none;
+}
+
+.drawing-editor__settings-panel {
+    border-top: 1px solid #e2e8f0;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.drawing-editor__settings-panel h3 {
+    margin-bottom: 0;
+}
+
+.drawing-editor__grid-line,
+.drawing-editor__axis-line {
+    pointer-events: none;
+}
+
+.drawing-circle,
+.drawing-circle-hit {
+    pointer-events: auto;
+}
+
+.drawing-circle--selected {
+    filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.65));
+}
+
+.drawing-polygon,
+.drawing-polygon-hit {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.drawing-polygon-hit {
+    pointer-events: visiblePainted;
+}
+
+.drawing-polygon--selected {
+    filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.65));
+}
+
+.drawing-editor__toolbox {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.drawing-editor__tool-select {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.drawing-editor__tool-group {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    padding: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.drawing-editor__tool-group-title {
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.drawing-editor__tool-group--empty {
+    border-style: dashed;
+}
+
+.drawing-editor__tool-note {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.drawing-editor__tool-button {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #0f172a;
+    border-radius: 8px;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: left;
+}
+
+.drawing-editor__tool-button:hover {
+    border-color: #3498db;
+    background: #eff6ff;
+}
+
+.drawing-editor__tool-button--active {
+    border-color: #2563eb;
+    background: #dbeafe;
+    color: #1e3a8a;
+    font-weight: 700;
+}
+
+.drawing-editor__label-field {
+    min-width: 240px;
+}
+
+.drawing-editor__toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    width: 100%;
+}
+
+@media (max-width: 1100px) {
+    .drawing-editor__toolbox {
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .drawing-editor__toolbox {
+        grid-template-columns: 1fr;
+    }
+}
+
+.drawing-editor__object-row em {
+    color: #64748b;
+    font-size: 0.78rem;
+    font-style: normal;
+    font-weight: 500;
+}
+
+.drawing-editor__plot-panel {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #dbeafe;
+    border-radius: 0.75rem;
+    background: #eff6ff;
+}
+
+.drawing-editor__plot-data {
+    min-height: 7rem;
+    width: 100%;
+    resize: vertical;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.drawing-plot {
+    cursor: pointer;
+}
+
+.drawing-editor__plot-axis-settings {
+    margin-top: 0.9rem;
+    padding: 0.85rem;
+    border: 1px solid #bfdbfe;
+    border-radius: 0.75rem;
+    background: #ffffff;
+}
+
+.drawing-editor__plot-axis-settings h4 {
+    margin: 0 0 0.75rem;
+    color: #1e3a8a;
+}
+
+.drawing-editor__plot-range-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.drawing-plot-title {
+    font-weight: 700;
+}
+
+.drawing-editor__main {
+    min-width: 0;
+}
+
+.drawing-editor__plot-panel--below-canvas {
+    margin-top: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.drawing-editor__plot-panel--below-canvas .drawing-editor__plot-data {
+    min-height: 10rem;
+}
+
+.drawing-editor__plot-panel--below-canvas .drawing-editor__field input,
+.drawing-editor__plot-panel--below-canvas .drawing-editor__field select,
+.drawing-editor__plot-panel--below-canvas .drawing-editor__field textarea {
+    box-sizing: border-box;
+}
+
+
+.drawing-editor__export-section {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.drawing-editor__export-section h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+}
+
+.drawing-editor__export-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: stretch;
+    margin-bottom: 1rem;
+}
+
+.drawing-editor__export-button {
+    width: 150px;
+    min-height: 42px;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+@media (max-width: 620px) {
+    .drawing-editor__export-button {
+        width: 100%;
+    }
+}
+
+/* Krok 33: układ inspirowany narzędziami geometrycznymi typu GeoGebra */
+.drawing-editor {
+    grid-template-columns: 270px minmax(0, 1fr) 330px;
+    gap: 0.85rem;
+}
+
+.drawing-editor__objects-panel,
+.drawing-editor__side-panel,
+.drawing-editor__toolbar,
+.drawing-editor__export-section {
+    background: #ffffff;
+    border: 1px solid #d7dee8;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.drawing-editor__objects-panel,
+.drawing-editor__side-panel {
+    padding: 0.9rem;
+    max-height: calc(100vh - 170px);
+    overflow: auto;
+    position: sticky;
+    top: 1rem;
+}
+
+.drawing-editor__panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.drawing-editor__panel-header h3,
+.drawing-editor__side-panel h3 {
+    margin: 0;
+}
+
+.drawing-editor__panel-header span {
+    min-width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: 700;
+}
+
+.drawing-editor__object-list {
+    margin-top: 0.85rem;
+}
+
+.drawing-editor__object-row {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.drawing-editor__canvas-wrap {
+    border-color: #cfd8e3;
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55), 0 1px 4px rgba(15, 23, 42, 0.08);
+}
+
+.drawing-editor__canvas {
+    background: #ffffff;
+}
+
+.drawing-editor__export-section--under-canvas {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding: 0.85rem;
+}
+
+.drawing-editor__export-section--under-canvas h3 {
+    font-size: 1rem;
+    margin: 0 0 0.65rem;
+}
+
+.drawing-editor__export-actions {
+    margin-bottom: 0;
+}
+
+.drawing-editor__export-button {
+    width: 150px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0 0.85rem;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.drawing-editor__tikz-preview-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+@media (max-width: 1180px) {
+    .drawing-editor {
+        grid-template-columns: 240px minmax(0, 1fr);
+    }
+
+    .drawing-editor__side-panel {
+        grid-column: 1 / -1;
+        position: static;
+        max-height: none;
+    }
+}
+
+@media (max-width: 820px) {
+    .drawing-editor {
+        grid-template-columns: 1fr;
+    }
+
+    .drawing-editor__objects-panel,
+    .drawing-editor__side-panel {
+        position: static;
+        max-height: none;
+    }
+}
+
+/* Krok 34: stabilizacja layoutu po poprawkach stylistycznych.
+   Lewy panel jest wąski, canvas zajmuje większość szerokości,
+   a panel edycji wysuwa się z prawej strony po kliknięciu zakładki. */
+.drawing-editor {
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+    gap: 0.75rem;
+    align-items: start;
+}
+
+.drawing-editor__objects-panel {
+    width: auto;
+    min-width: 0;
+    max-width: 220px;
+    padding: 0.75rem;
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 170px);
+    overflow: auto;
+}
+
+.drawing-editor__objects-panel .drawing-editor__hint {
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+
+.drawing-editor__object-row {
+    padding: 0.5rem;
+    font-size: 0.86rem;
+}
+
+.drawing-editor__object-row small {
+    font-size: 0.74rem;
+}
+
+.drawing-editor__main {
+    min-width: 0;
+    width: 100%;
+}
+
+.drawing-editor__canvas-wrap {
+    width: 100%;
+}
+
+.drawing-editor__canvas {
+    min-height: 560px;
+}
+
+.drawing-editor__side-panel {
+    position: fixed !important;
+    right: 0;
+    top: 132px;
+    width: min(380px, calc(100vw - 72px));
+    max-width: min(380px, calc(100vw - 72px));
+    max-height: calc(100vh - 150px);
+    padding: 0 !important;
+    margin: 0;
+    overflow: visible !important;
+    z-index: 1000;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: translateX(calc(100% - 44px));
+    transition: transform 0.22s ease;
+}
+
+.drawing-editor__side-panel[open] {
+    transform: translateX(0);
+}
+
+.drawing-editor__drawer-tab {
+    position: absolute;
+    left: -44px;
+    top: 18px;
+    width: 44px;
+    min-height: 146px;
+    box-sizing: border-box;
+    padding: 0.75rem 0.35rem;
+    background: #2c3e50;
+    color: #ffffff;
+    border-radius: 12px 0 0 12px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.2);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    list-style: none;
+    user-select: none;
+}
+
+.drawing-editor__drawer-tab::-webkit-details-marker {
+    display: none;
+}
+
+.drawing-editor__drawer-tab::marker {
+    content: "";
+}
+
+.drawing-editor__side-panel-content {
+    background: #ffffff;
+    border: 1px solid #d7dee8;
+    border-right: 0;
+    border-radius: 14px 0 0 14px;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
+    padding: 1rem;
+    max-height: calc(100vh - 150px);
+    overflow: auto;
+}
+
+.drawing-editor__side-panel-content > h3 {
+    margin-top: 0;
+}
+
+.drawing-editor__default-style-panel,
+.drawing-editor__settings-panel,
+.drawing-editor__content-panel,
+.drawing-editor__style-panel {
+    border-top: 1px solid #e2e8f0;
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+@media (max-width: 900px) {
+    .drawing-editor {
+        grid-template-columns: 1fr !important;
+    }
+
+    .drawing-editor__objects-panel {
+        max-width: none;
+        position: static;
+        max-height: none;
+    }
+
+    .drawing-editor__side-panel {
+        top: 92px;
+        width: min(360px, calc(100vw - 62px));
+        max-width: min(360px, calc(100vw - 62px));
+    }
+}
+
+/* Krok 35: dopracowany wysuwany panel edycji z zakładkami. */
+.drawing-editor__drawer-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.drawing-editor__drawer-header h3 {
+    margin: 0 0 0.25rem;
+}
+
+.drawing-editor__drawer-close {
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #334155;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.drawing-editor__drawer-close:hover {
+    background: #e2e8f0;
+}
+
+.drawing-editor__drawer-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+    margin: 0.85rem 0;
+}
+
+.drawing-editor__drawer-tab-button {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    border-radius: 999px;
+    padding: 0.48rem 0.55rem;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.drawing-editor__drawer-tab-button:hover {
+    background: #eef2f7;
+}
+
+.drawing-editor__drawer-tab-button--active {
+    background: #2c3e50;
+    border-color: #2c3e50;
+    color: #ffffff;
+}
+
+.drawing-editor__drawer-section[hidden] {
+    display: none !important;
+}
+
+.drawing-editor__drawer-section {
+    animation: drawing-editor-panel-in 0.16s ease-out;
+}
+
+@keyframes drawing-editor-panel-in {
+    from { opacity: 0; transform: translateX(6px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.drawing-editor__side-panel-content > .drawing-editor__default-style-panel,
+.drawing-editor__side-panel-content > .drawing-editor__settings-panel,
+.drawing-editor__side-panel-content > .drawing-editor__content-panel,
+.drawing-editor__side-panel-content > .drawing-editor__style-panel,
+.drawing-editor__drawer-section .drawing-editor__default-style-panel,
+.drawing-editor__drawer-section .drawing-editor__settings-panel,
+.drawing-editor__drawer-section .drawing-editor__content-panel,
+.drawing-editor__drawer-section .drawing-editor__style-panel {
+    border-top: 0;
+    margin-top: 0;
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.drawing-editor__drawer-section h3 {
+    margin-top: 0;
+}
+
+.drawing-editor__field[hidden],
+.drawing-editor__checkbox-field[hidden] {
+    display: none !important;
+}
+
+.drawing-editor__content-panel--disabled,
+.drawing-editor__style-panel--disabled {
+    opacity: 0.8;
+}
+
+.drawing-editor__drawer-section .btn {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Krok 38 — wygodniejszy panel wykresów */
+.drawing-editor__plot-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.drawing-editor__plot-header h3 {
+    margin: 0 0 0.25rem;
+}
+
+.drawing-editor__plot-layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.drawing-editor__plot-card {
+    background: #ffffff;
+    border: 1px solid #bfdbfe;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.drawing-editor__plot-card--settings {
+    margin-top: 1rem;
+}
+
+.drawing-editor__plot-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+    margin-bottom: 0.75rem;
+}
+
+.drawing-editor__plot-card h4,
+.drawing-editor__plot-form h5 {
+    margin: 0 0 0.75rem;
+    color: #1e3a8a;
+}
+
+.drawing-editor__plot-list {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.drawing-editor__plot-list-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.55rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.65rem;
+    background: #f8fafc;
+}
+
+.drawing-editor__plot-color {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+}
+
+.drawing-editor__plot-list-text {
+    display: grid;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.drawing-editor__plot-list-text strong,
+.drawing-editor__plot-list-text small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.drawing-editor__plot-list-text small {
+    color: #64748b;
+}
+
+.drawing-editor__plot-form {
+    padding-top: 0.85rem;
+    border-top: 1px solid #dbeafe;
+}
+
+.drawing-editor__plot-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.drawing-editor__plot-form-grid--wide {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.drawing-editor__plot-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.btn-small {
+    padding: 0.3rem 0.55rem;
+    font-size: 0.78rem;
+}
+
+.drawing-editor__empty-list {
+    margin: 0;
+    padding: 0.7rem;
+    color: #64748b;
+    border: 1px dashed #bfdbfe;
+    border-radius: 0.65rem;
+    background: #eff6ff;
+}
+
+@media (max-width: 1100px) {
+    .drawing-editor__plot-layout,
+    .drawing-editor__plot-form-grid,
+    .drawing-editor__plot-form-grid--wide {
+        grid-template-columns: 1fr;
+    }
+
+    .drawing-editor__plot-header,
+    .drawing-editor__plot-card-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .drawing-editor__plot-list-row {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+}
+
+/* Krok 39: czytelniejsza lista obiektów po lewej */
+.drawing-editor__object-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.35rem;
+    align-items: stretch;
+    text-align: left;
+}
+
+.drawing-editor__object-row--hidden {
+    opacity: 0.62;
+}
+
+.drawing-editor__object-main {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+    min-width: 0;
+}
+
+.drawing-editor__object-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.drawing-editor__object-title code {
+    width: fit-content;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    background: #e2e8f0;
+    color: #334155;
+    border-radius: 999px;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.72rem;
+}
+
+.drawing-editor__object-meta {
+    color: #94a3b8;
+}
+
+.drawing-editor__object-visibility {
+    align-self: start;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    min-width: 3.1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #334155;
+    padding: 0.25rem 0.35rem;
+    cursor: pointer;
+    font-size: 0.72rem;
+}
+
+.drawing-editor__object-visibility:hover {
+    border-color: #2563eb;
+    color: #1d4ed8;
+    background: #eff6ff;
+}

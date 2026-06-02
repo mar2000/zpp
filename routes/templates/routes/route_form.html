@@ -1,0 +1,185 @@
+{% extends "routes/base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2><i class="fas fa-route"></i> {% if object %}Edytuj{% else %}Nowa{% endif %} trasa </h2>
+        </div>
+        
+        <form method="post" enctype="multipart/form-data" class="route-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}"><i class="fas fa-heading"></i> Nazwa trasy</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                <div class="form-error"><i class="fas fa-exclamation-triangle"></i> {{ form.title.errors|first }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.background.id_for_label }}"><i class="fas fa-image"></i> Tło</label>
+                {{ form.background }}
+                {% if form.background.errors %}
+                <div class="form-error"><i class="fas fa-exclamation-triangle"></i> {{ form.background.errors|first }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Zapisz
+                </button>
+                <a href="{% url 'route_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Anuluj
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+<style>
+.form-container {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.form-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 600px;
+    overflow: hidden;
+}
+
+.form-header {
+    background: var(--primary-blue);
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.form-header h2 {
+    margin: 0;
+    font-weight: 500;
+}
+
+.form-header i {
+    margin-right: 10px;
+}
+
+.route-form {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    color: var(--primary-blue);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-group label i {
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+.form-error {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-error i {
+    margin-right: 5px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 2rem;
+}
+
+.form-actions .btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0.8rem;
+}
+
+@media (max-width: 480px) {
+    .form-container {
+        padding: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+
+
+
+/* Dodatkowe style dla komunikatów o błędach */
+.error-message {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Spójne style dla wszystkich pól formularza */
+input, select, textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Dla pól typu checkbox */
+input[type="checkbox"] {
+    width: auto;
+}
+
+
+
+</style>
+{% endblock %}

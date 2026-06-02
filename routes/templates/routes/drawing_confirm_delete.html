@@ -1,0 +1,15 @@
+{% extends "routes/base.html" %}
+
+{% block content %}
+<div style="max-width:600px; margin:0 auto; background:white; border-radius:8px; padding:2rem; box-shadow:0 2px 5px rgba(0,0,0,0.06);">
+    <h2>Usuń rysunek</h2>
+    <p>Czy na pewno chcesz usunąć rysunek <strong>{{ drawing.title }}</strong>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <div style="display:flex; gap:0.75rem; margin-top:1.5rem;">
+            <button type="submit" class="btn btn-danger">Usuń</button>
+            <a href="{% url 'drawing_detail' drawing.pk %}" class="btn btn-secondary">Anuluj</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
